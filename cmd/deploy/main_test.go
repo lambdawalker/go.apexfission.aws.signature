@@ -125,3 +125,12 @@ func TestFingerprintRejectsExternalLocalReplacement(t *testing.T) {
 		t.Fatal("external replacement was silently cached")
 	}
 }
+
+func TestEnvironmentNamesFitAWSResourceLimits(t *testing.T) {
+	if environmentRE.MatchString(strings.Repeat("a", 17)) {
+		t.Fatal("environment permits S3 evidence names longer than 63 bytes")
+	}
+	if !environmentRE.MatchString("abcdefghijklmnop") {
+		t.Fatal("16-character environment should be supported")
+	}
+}

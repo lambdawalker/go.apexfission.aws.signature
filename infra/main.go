@@ -13,6 +13,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -92,6 +93,9 @@ func deploy(ctx *pulumi.Context) error {
 	identity := ctx.Project() + "-" + ctx.Stack()
 	account := cfg.Require("awsAccount")
 	region := config.Require(ctx, "aws:region")
+	if e := validateResourceIdentity(ctx.Stack(), account, region); e != nil {
+		return e
+	}
 	tags := pulumi.StringMap{"Project": s("sworn-ink"), "Environment": s(ctx.Stack())}
 	yes := pulumi.Bool(true)
 	storage := add("kms/key:Key", "storage", pulumi.Map{"tags": tags, "enableKeyRotation": yes, "deletionWindowInDays": pulumi.Int(30)})
@@ -134,3 +138,11 @@ func deploy(ctx *pulumi.Context) error {
 	return nil
 }
 func main() { pulumi.Run(deploy) }
+
+// Keep names within S3's 63-byte limit, including longer commercial AWS regions.
+func validateResourceIdentity(stack, account, region string) error {
+	if !regexp.MustCompile(`^[a-z][a-z0-9-]{0,15}$`).MatchString(stack) || !regexp.MustCompile(`^[0-9]{12}$`).MatchString(account) || len("sworn-ink-"+account+"-"+region+"-"+stack+"-evidence") > 63 {
+		return errors.New("invalid AWS resource identity: environment must contain 1..16 lowercase characters and account must be 12 digits")
+	}
+	return nil
+}

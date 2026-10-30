@@ -51,7 +51,7 @@ type configData struct {
 	Environment, Profile, Account, Region, Backend, Repository, RoleARN string
 }
 
-var environmentRE = regexp.MustCompile(`^[a-z][a-z0-9-]{0,31}$`)
+var environmentRE = regexp.MustCompile(`^[a-z][a-z0-9-]{0,15}$`)
 
 // in must be closable if it can block beyond timeout; closing prevents a leaked reader.
 func confirm(in io.Reader, out io.Writer, timeout time.Duration) bool {
@@ -307,7 +307,7 @@ func run() error {
 		}
 	}
 	if !environmentRE.MatchString(*env) {
-		return errors.New("invalid environment")
+		return errors.New("environment must contain 1..16 lowercase letters, digits or hyphens and start with a letter")
 	}
 	home, e := os.UserConfigDir()
 	if e != nil {

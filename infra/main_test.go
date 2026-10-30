@@ -26,3 +26,12 @@ func TestIAMHasNoWildcardResource(t *testing.T) {
 		}
 	}
 }
+
+func TestResourceIdentityRejectsUnrepresentableBucketNames(t *testing.T) {
+	if validateResourceIdentity("abcdefghijklmnopq", "123456789012", "ap-southeast-7") == nil {
+		t.Fatal("accepted environment above supported limit")
+	}
+	if e := validateResourceIdentity("abcdefghijklmnop", "123456789012", "ap-southeast-7"); e != nil {
+		t.Fatal(e)
+	}
+}

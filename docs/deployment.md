@@ -6,7 +6,7 @@ This project deploys one Backend component: API Gateway HTTP API, Lambda, Dynamo
 
 Go 1.26+, AWS CLI v2, Pulumi 3.200+, and GitHub CLI v2 for optional GitHub setup must be on PATH. CI pins Go 1.26.6 and Pulumi 3.264.0; the AWS provider is pinned to 7.44.0. Only the commercial AWS partition is currently supported. Set up an IAM Identity Center profile with `aws configure sso`; the wizard validates STS and invokes `aws sso login --profile PROFILE` for an expired interactive session. CI uses OIDC. Long-lived credentials are never requested.
 
-The root `deploy.sh` and `deploy.bat` resolve the repository independently of the caller's directory and invoke the same Go program. Select the environment first: dev, qa, prod or a validated lowercase custom name up to 32 characters. No implicit production target exists. Saved settings are scoped to `sworn-ink/ENV` under the platform configuration directory. Explicit environment variables override saved answers. The environment operation lock serializes local runs; stale locks are never automatically stolen.
+The root `deploy.sh` and `deploy.bat` resolve the repository independently of the caller's directory and invoke the same Go program. Select the environment first: dev, qa, prod or a validated lowercase custom name up to 16 characters (keeps deterministic S3 names within AWS limits). No implicit production target exists. Saved settings are scoped to `sworn-ink/ENV` under the platform configuration directory. Explicit environment variables override saved answers. The environment operation lock serializes local runs; stale locks are never automatically stolen.
 
 | Input | Meaning |
 | --- | --- |
