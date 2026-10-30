@@ -1,0 +1,37 @@
+name: Validate
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.26.6'
+          cache-dependency-path: |
+            go.sum
+            infra/go.sum
+            cmd/deploy/go.sum
+      - run: go test -race ./...
+      - run: go vet ./...
+      - run: go build -o build/bootstrap ./cmd/api
+        env:
+          GOOS: linux
+          GOARCH: arm64
+      - run: go test -race ./... && go vet ./...
+        working-directory: infra
+      - run: go test -race ./... && go vet ./...
+        working-directory: cmd/deploy
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python3 -m unittest discover -s sites -p 'test_*.py'
+      - run: python3 sites/build.py --check
