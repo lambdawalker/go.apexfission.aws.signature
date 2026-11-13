@@ -118,7 +118,7 @@ require (
 replace github.com/lambdawalker/go.apexfission.aws.signature => ..
 
 require (
-	github.com/lambdawalker/go.apexfission.aws.signature v0.0.0-00010101000000-000000000000
+	github.com/lambdawalker/go.apexfission.aws.signature v0.0.0-20261113133532-8255a4d93cf1
 	github.com/lambdawalker/go.infra.composer v0.0.0-20261103235125-ad4cfd268616
 	github.com/lambdawalker/go.infra.composer/adapters/pulumi v0.0.0-20261103235125-ad4cfd268616
 	github.com/pulumi/pulumi/sdk/v3 v3.273.0
