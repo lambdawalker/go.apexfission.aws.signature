@@ -1,0 +1,6 @@
+build/
+sites/dist/
+.superpowers/
+*.zip
+__pycache__/
+*.pyc

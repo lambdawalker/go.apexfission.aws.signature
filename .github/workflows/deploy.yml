@@ -1,0 +1,75 @@
+name: Deploy signature backend
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Protected backend environment (dev, qa, prod or configured custom name)
+        required: true
+        type: string
+      action:
+        description: Preview or explicitly deploy
+        required: true
+        default: preview
+        type: choice
+        options: [preview, deploy]
+      approve:
+        description: Explicitly authorize applying a successful preview
+        required: true
+        default: false
+        type: boolean
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: sworn-ink-backend-${{ inputs.environment }}
+  cancel-in-progress: false
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      DEPLOY_ACCOUNT: ${{ vars.DEPLOY_ACCOUNT }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      DEPLOY_BACKEND: ${{ vars.DEPLOY_BACKEND }}
+      DEPLOY_ROLE_ARN: ${{ vars.DEPLOY_ROLE_ARN }}
+      DEPLOY_REPOSITORY: ${{ github.repository }}
+      TARGET_ENVIRONMENT: ${{ inputs.environment }}
+      TARGET_ACTION: ${{ inputs.action }}
+      TARGET_APPROVAL: ${{ inputs.approve }}
+      PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.26.6'
+          cache-dependency-path: |
+            go.sum
+            infra/go.sum
+            cmd/deploy/go.sum
+      - name: Validate complete explicit target
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$TARGET_ENVIRONMENT" =~ ^[a-z][a-z0-9-]{0,31}$ ]]
+          for name in DEPLOY_ACCOUNT AWS_REGION DEPLOY_BACKEND DEPLOY_ROLE_ARN PULUMI_CONFIG_PASSPHRASE; do
+            test -n "${!name}" || { echo "Missing environment configuration: $name"; exit 1; }
+          done
+          if [[ "$TARGET_ACTION" == deploy && "$TARGET_APPROVAL" != true ]]; then
+            echo 'Deploy requires explicit approval input.'; exit 1
+          fi
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          allowed-account-ids: ${{ vars.DEPLOY_ACCOUNT }}
+          role-session-name: sworn-ink-${{ github.run_id }}
+      - uses: pulumi/setup-pulumi@v2
+        with:
+          pulumi-version: '3.264.0'
+      - name: Build and preview or apply the saved plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--environment "$TARGET_ENVIRONMENT" --action "$TARGET_ACTION" --noninteractive)
+          if [[ "$TARGET_ACTION" == deploy ]]; then args+=(--approve); fi
+          ./deploy.sh "${args[@]}"

@@ -1,0 +1,11 @@
+# Copy only for a genuinely new stack; restore existing stack YAML from S3.
+config:
+  sworn-ink:awsAccount: "123456789012"
+  aws:region: us-east-1
+  sworn-ink:jwtIssuer: https://issuer.example.invalid
+  sworn-ink:jwtAudience: REPLACE
+  sworn-ink:jwtScope: signature:write
+  sworn-ink:appPackage: REPLACE
+  sworn-ink:appDigests: REPLACE_WITH_REVIEWED_SHA256_HEX
+  sworn-ink:googleRootsPEM: REPLACE_WITH_REVIEWED_ROOT_PEM
+  sworn-ink:logRetentionDays: 30

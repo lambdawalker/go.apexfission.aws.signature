@@ -1,0 +1,19 @@
+{
+  "canonical": "en",
+  "locale": "es",
+  "review": "Translated against the canonical guide content; code fences preserved. Update hashes only after reviewing the corresponding translation.",
+  "schema": 1,
+  "scope": "Development",
+  "sources": {
+    "api.md": "a370f1cb39b14604cd0e73506b3e3df7b44132a11aebce2020d1b34fd917a671",
+    "concepts.md": "157085f87634859a49eec14fa9ca2b99e0eb6ac5d68ff19d22b2ee6af285b236",
+    "index.md": "4e9b301bfe92c83019c1144c9b27aef4505c107eaedc32bf8812394a4f5bbde7",
+    "migration.md": "83961ac32f979eb222754c11a70ebfa1f97a816b1955d7702097c0a128079d8b",
+    "operations.md": "eefc4c339927d7565ac57402961cd08379bffcd8b2a6febdf8567867962fe614",
+    "protocol.md": "258a6cb0a99354bbadb61db8830c4b3a0e3d38159d37777e3d61a3d6dcdb3349",
+    "quickstart.md": "b20839aa1bb727b428e690e7ad695d403a07c76d88b1fd56c91ca95f6265d1cc",
+    "recipes.md": "ac20607973b3486846e4aa6e383f23e9e1971df550700cd12c5a513aa1dcf628",
+    "security.md": "b6d14e0d2a9ee0381824b8235b1d78cba55fa3990ac525fcb9083ba9847998d2",
+    "troubleshooting.md": "c999c738e634c8eed22c75028682f4a4ad41c87664a90ebd88d9b024ffcb67d2"
+  }
+}

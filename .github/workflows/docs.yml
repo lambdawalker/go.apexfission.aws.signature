@@ -1,0 +1,37 @@
+name: Publish documentation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.repository == 'lambdawalker/go.apexfission.aws.signature' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python3 -m unittest discover -s sites -p 'test_*.py'
+      - run: python3 sites/build.py --check
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: sites/dist
+  publish:
+    if: github.repository == 'lambdawalker/go.apexfission.aws.signature' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v5
+        id: deployment
